@@ -8,3 +8,5 @@ conn = pyodbc.connect(
 )
 
 cursor = conn.cursor()
+
+print("Database connected successfully")

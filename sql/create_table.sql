@@ -1,8 +1,6 @@
 ﻿CREATE TABLE locations (
     location_id INT PRIMARY KEY,
-    city NVARCHAR(255),       
-    district NVARCHAR(255),   
-    ward NVARCHAR(255)       
+    location NVARCHAR(255)    
 );
 
 CREATE TABLE weather_data (
@@ -21,7 +19,7 @@ CREATE TABLE weather_data (
 
 CREATE TABLE river_data (
     river_id INT PRIMARY KEY,
-    location_id INT, -- Đồng bộ kiểu INT với bảng locations
+    location_id INT, 
     date DATE,
     river_discharge REAL,
 

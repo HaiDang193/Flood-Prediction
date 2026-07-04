@@ -1,4 +1,5 @@
 import tkinter as tk
+from datetime import datetime
 from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
 
@@ -14,8 +15,6 @@ class WeatherApp:
         self.root.geometry("420x430")
 
         self.city_var = tk.StringVar()
-        self.district_var = tk.StringVar()
-        self.ward_var = tk.StringVar()
 
         self.create_main_ui()
 
@@ -30,31 +29,8 @@ class WeatherApp:
             width=30
         )
         self.city_combo.pack()
-        self.city_combo.bind("<<ComboboxSelected>>", self.update_districts)
-
-        tk.Label(self.root, text="Chọn quận/huyện").pack(pady=5)
-
-        self.district_combo = ttk.Combobox(
-            self.root,
-            textvariable=self.district_var,
-            state="readonly",
-            width=30
-        )
-        self.district_combo.pack()
-        self.district_combo.bind("<<ComboboxSelected>>", self.update_wards)
-
-        tk.Label(self.root, text="Chọn xã/phường").pack(pady=5)
-
-        self.ward_combo = ttk.Combobox(
-            self.root,
-            textvariable=self.ward_var,
-            state="readonly",
-            width=30
-        )
-        self.ward_combo.pack()
 
         self.city_combo.current(0)
-        self.update_districts()
 
         tk.Label(self.root, text="Ngày bắt đầu").pack(pady=5)
 
@@ -82,23 +58,6 @@ class WeatherApp:
             fg="white",
             width=15
         ).pack(pady=20)
-
-    def update_districts(self, event=None):
-        city = self.city_var.get()
-        districts = list(CITIES[city].keys())
-
-        self.district_combo["values"] = districts
-        self.district_combo.current(0)
-
-        self.update_wards()
-
-    def update_wards(self, event=None):
-        city = self.city_var.get()
-        district = self.district_var.get()
-        wards = list(CITIES[city][district].keys())
-
-        self.ward_combo["values"] = wards
-        self.ward_combo.current(0)
 
     def show_main_window(self):
         self.select_window.destroy()
@@ -176,12 +135,16 @@ class WeatherApp:
 
     def load_weather_data(self):
         city = self.city_var.get()
-        district = self.district_var.get()
-        ward = self.ward_var.get()
 
-        latitude, longitude = CITIES[city][district][ward]
+        latitude, longitude = CITIES[city]
 
-        location_name = f"{ward}, {district}, {city}"
+        location_name = city
+        start_date = self.start_calendar.get()
+        end_date = self.end_calendar.get()
+
+        if datetime.strptime(start_date, "%Y-%m-%d") > datetime.strptime(end_date, "%Y-%m-%d"):
+            messagebox.showerror("Lỗi", "Ngày bắt đầu không được lớn hơn ngày kết thúc")
+            return
 
         selected = []
 
@@ -212,8 +175,8 @@ class WeatherApp:
                 city=location_name,
                 latitude=latitude,
                 longitude=longitude,
-                start_date=self.start_calendar.get(),
-                end_date=self.end_calendar.get(),
+                start_date=start_date,
+                end_date=end_date,
                 selected=selected
             )
 
@@ -272,7 +235,7 @@ class WeatherApp:
         tk.Button(
             table_window,
             text="Xuất CSV",
-            command=lambda: self.save_csv(df, city),
+            command=lambda: self.save_csv(df, city, table_window),
             bg="green",
             fg="white",
             width=15
@@ -282,7 +245,9 @@ class WeatherApp:
         table_window.destroy()
         self.root.deiconify()
 
-    def save_csv(self, df, city):
+    def save_csv(self, df, city, table_window):
         filename = export_to_csv(df, city)
         messagebox.showinfo("Thành công", f"Đã xuất {filename}")
-        self.root.quit()
+        
+        table_window.destroy()
+        self.root.deiconify()

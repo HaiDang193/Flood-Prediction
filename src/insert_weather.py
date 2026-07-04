@@ -1,24 +1,30 @@
 import pandas as pd
 from db_connection import conn, cursor
+import os
 
-df = pd.read_csv(r"..\data\cleaned\cleaned_weather.csv")
+#lấy đường dẫn của file hiện tại
+cur_dir = os.path.dirname(os.path.abspath(__file__))
 
-locations = pd.read_sql(
-    """
+#tạo đường dẫn đến file csv
+csv_path = os.path.join(cur_dir, "..", "data", "cleaned", "cleaned_weather.csv")
+
+# chuyển đường dẫn thành đường dẫn tuyệt đối
+csv_path = os.path.abspath(csv_path)
+
+df = pd.read_csv(csv_path)
+
+query = """
     SELECT *
     FROM locations
-    """,
-    conn
-)
+    """
+locations = pd.read_sql(query, conn)
 
 mapping = {}
 
 for _, row in locations.iterrows():
     mapping[
         (
-            row["city"],
-            row["district"],
-            row["ward"]
+            row["location"]
         )
     ] = row["location_id"]
 
@@ -26,9 +32,7 @@ df["location_id"] = df.apply(
     lambda row:
     mapping[
         (
-            row["city"],
-            row["district"],
-            row["ward"]
+            row["location"]
         )
     ],
     axis=1
@@ -38,11 +42,9 @@ df["location_id"] = df.apply(
 df["weather_id"] = range(1, len(df) + 1)
 
 # Xóa sạch dữ liệu cũ
-cursor.execute("TRUNCATE TABLE weather_data")
+cursor.execute("DELETE FROM weather_data")
 
-for _, row in df.iterrows():
-    cursor.execute(
-        """
+insert_weather = """
         INSERT INTO weather_data
         (
             weather_id,
@@ -58,18 +60,19 @@ for _, row in df.iterrows():
         (
             ?, ?, ?, ?, ?, ?, ?, ?
         )
-        """,
-        (
-            int(row["weather_id"]),
-            int(row["location_id"]),
-            row["date"],
-            float(row["rainfall"]),
-            float(row["temperature"]),
-            float(row["humidity"]),
-            float(row["pressure"]),
-            float(row["wind_speed"])
+        """
+for _, row in df.iterrows():
+    cursor.execute(
+        insert_weather,
+        int(row["weather_id"]),
+        int(row["location_id"]),
+        row["date"],
+        float(row["rainfall"]),
+        float(row["temperature"]),
+        float(row["humidity"]),
+        float(row["pressure"]),
+        float(row["wind_speed"])
         )
-    )
 
 conn.commit()
 

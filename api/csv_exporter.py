@@ -17,6 +17,7 @@ def export_to_csv(df, city):
     
     filepath = os.path.join(save_dir, filename)
     
+    #đè vào file nếu đã tồn tại hoặc không tồn tại
     df.to_csv(filepath, index=False, encoding="utf-8-sig")
 
     return os.path.abspath(filepath)

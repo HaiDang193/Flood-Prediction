@@ -1,11 +1,21 @@
 import pandas as pd
 from db_connection import conn, cursor
+import os
 
-df = pd.read_csv(r"..\data\cleaned\cleaned_weather.csv")
+#lấy đường dẫn của file hiện tại
+cur_dir = os.path.dirname(os.path.abspath(__file__))
+
+#tạo đường dẫn đến file csv
+csv_path = os.path.join(cur_dir, "..", "data", "cleaned", "cleaned_weather.csv")
+
+# chuyển đường dẫn thành đường dẫn tuyệt đối
+csv_path = os.path.abspath(csv_path)
+
+df = pd.read_csv(csv_path)
 
 locations = (
     df[
-        ["city","district","ward"]
+        ["location"]
     ]
     .drop_duplicates()
     .reset_index(drop=True)
@@ -13,28 +23,24 @@ locations = (
 
 locations["location_id"] = locations.index + 1
 
-# Xóa sạch dữ liệu cũ
-cursor.execute("TRUNCATE TABLE locations")
-
-for _, row in locations.iterrows():
-
-    cursor.execute("""
-    INSERT INTO locations
-    (
+insert_locations = """
+    INSERT INTO locations(
         location_id,
-        city,
-        district,
-        ward
+        location
     )
     VALUES
     (
-        ?, ?, ?, ?
+        ?, ?
     )
-    """,
-    int(row["location_id"]),
-    row["city"],
-    row["district"],
-    row["ward"])
+    """
+
+# Xóa sạch dữ liệu cũ
+cursor.execute("DELETE FROM weather_data")
+cursor.execute("DELETE FROM river_data")
+cursor.execute("DELETE FROM locations")
+
+for _, row in locations.iterrows():
+    cursor.execute(insert_locations, int(row["location_id"]), row["location"])
 
 conn.commit()
 

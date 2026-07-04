@@ -2,6 +2,19 @@ import requests
 import pandas as pd
 
 
+def _get_error_message(response, fallback):
+    try:
+        data = response.json()
+    except ValueError:
+        data = {}
+
+    reason = data.get("reason")
+    if reason:
+        return f"{fallback}: {reason}"
+
+    return f"{fallback} (HTTP {response.status_code})"
+
+
 def get_weather_data(city, latitude, longitude, start_date, end_date, selected):
     weather_selected = []
     flood_selected = []
@@ -26,12 +39,15 @@ def get_weather_data(city, latitude, longitude, start_date, end_date, selected):
             "timezone": "Asia/Bangkok"
         }
 
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=30)
 
         if response.status_code != 200:
-            raise Exception("Không lấy được dữ liệu thời tiết")
+            raise Exception(_get_error_message(response, "Không lấy được dữ liệu thời tiết"))
 
         data = response.json()
+        if "daily" not in data:
+            raise Exception("Không có dữ liệu thời tiết trong khoảng ngày đã chọn")
+
         df_weather = pd.DataFrame(data["daily"])
 
         final_df = df_weather
@@ -47,12 +63,15 @@ def get_weather_data(city, latitude, longitude, start_date, end_date, selected):
             "daily": ",".join(flood_selected)
         }
 
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=30)
 
         if response.status_code != 200:
-            raise Exception("Không lấy được dữ liệu river discharge")
+            raise Exception(_get_error_message(response, "Không lấy được dữ liệu river discharge"))
 
         data = response.json()
+        if "daily" not in data:
+            raise Exception("Không có dữ liệu river discharge trong khoảng ngày đã chọn")
+
         df_flood = pd.DataFrame(data["daily"])
 
         if final_df is None:
