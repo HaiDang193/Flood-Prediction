@@ -12,9 +12,6 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data
-data/raw/*.csv
-
 # Models
 *.pkl
 *.joblib
@@ -22,3 +19,10 @@ data/raw/*.csv
 # SQL Server local files
 *.ldf
 *.mdf
+.database/
+
+# output
+.output/
+
+#doc
+*.docx

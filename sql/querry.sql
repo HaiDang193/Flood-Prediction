@@ -1,4 +1,4 @@
-SELECT * FROM locations
+SELECT * FROM location_data
 
 SELECT * FROM weather_data
 
@@ -20,5 +20,5 @@ INNER JOIN river_data r
 ON w.location_id = r.location_id
 AND CAST(w.[date] AS DATE) = CAST(r.[date] AS DATE)
 
-INNER JOIN locations l
+INNER JOIN location_data l
 ON w.location_id = l.location_id

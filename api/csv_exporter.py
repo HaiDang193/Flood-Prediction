@@ -9,7 +9,7 @@ def export_to_csv(df, city):
 
     
     # Đi lên 1 cấp, rồi vào data/raw
-    save_dir = os.path.join(current_dir, "..", "data", "raw")
+    save_dir = os.path.join(current_dir, "..", "data", "data_raw")
     save_dir = os.path.abspath(save_dir)
     
     # Tạo thư mục nếu chưa tồn tại

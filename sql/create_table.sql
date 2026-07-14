@@ -1,4 +1,4 @@
-﻿CREATE TABLE locations (
+﻿CREATE TABLE location_data (
     location_id INT PRIMARY KEY,
     location NVARCHAR(255)    
 );
@@ -14,7 +14,7 @@ CREATE TABLE weather_data (
     wind_speed REAL,
 
     FOREIGN KEY(location_id) 
-    REFERENCES locations(location_id)
+    REFERENCES location_data(location_id)
 );
 
 CREATE TABLE river_data (
@@ -24,20 +24,11 @@ CREATE TABLE river_data (
     river_discharge REAL,
 
     FOREIGN KEY(location_id) 
-    REFERENCES locations(location_id)
+    REFERENCES location_data(location_id)
 );
 
-CREATE TABLE flood_label (
-    label_id INT PRIMARY KEY,
+CREATE TABLE label_data(
     location_id INT,
-    date DATE,
-
-    flood_risk INT, 
-    -- 0 = Low
-    -- 1 = Medium
-    -- 2 = High
-    water_rise REAL,
-
-    FOREIGN KEY(location_id) 
-    REFERENCES locations(location_id)
-);
+    date Date,
+    flood INT
+)

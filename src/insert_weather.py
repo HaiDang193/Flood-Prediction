@@ -6,7 +6,7 @@ import os
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 #tạo đường dẫn đến file csv
-csv_path = os.path.join(cur_dir, "..", "data", "cleaned", "cleaned_weather.csv")
+csv_path = os.path.join(cur_dir, "..", "data", "cleaned", "weather_cleaned.csv")
 
 # chuyển đường dẫn thành đường dẫn tuyệt đối
 csv_path = os.path.abspath(csv_path)
@@ -15,13 +15,13 @@ df = pd.read_csv(csv_path)
 
 query = """
     SELECT *
-    FROM locations
+    FROM location_data
     """
-locations = pd.read_sql(query, conn)
+location_data = pd.read_sql(query, conn)
 
 mapping = {}
 
-for _, row in locations.iterrows():
+for _, row in location_data.iterrows():
     mapping[
         (
             row["location"]
