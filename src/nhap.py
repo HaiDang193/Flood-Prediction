@@ -5,7 +5,7 @@ print("=" * 118)
 print(f"{'Dataset':<22}: API Open-Meteo and EM-DAT")
 print(f"{'Period':<22}: 2001-01-01 to 2026-07-22")
 print(f"{'Total samples':<22}: 18,268")
-print(f"{'Features used':<22}: 16")
+print(f"{'Features used':<22}: 11")
 print(f"{'Target variables':<22}: target_d1, target_d2, target_d3")
 print(f"{'Data Storage':<22}: SQL Server Management Studio (db: flood)")
 
