@@ -13,15 +13,19 @@ csv_path = os.path.abspath(csv_path)
 
 df = pd.read_csv(csv_path)
 
+# Tạo flood_id tự động
+df["flood_id"] = range(1, len(df) + 1)
+
 insert_label_data = """
     INSERT INTO label_data(
+        flood_id,
         location_id,
         date,
         flood
     )
     VALUES
     (
-        ?, ?, ?
+        ?, ?, ?,?
     )
     """
 
@@ -30,6 +34,7 @@ cursor.execute("DELETE FROM label_data")
 
 for _, row in df.iterrows():
     cursor.execute(insert_label_data,
+                    int(row['flood_id']),
                     int(row["location_id"]),
                     row["date"],
                     int(row["flood"]))

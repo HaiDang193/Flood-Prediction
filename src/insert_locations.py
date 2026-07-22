@@ -37,6 +37,7 @@ insert_location_data = """
 # Xóa sạch dữ liệu cũ
 cursor.execute("DELETE FROM weather_data")
 cursor.execute("DELETE FROM river_data")
+cursor.execute("DELETE FROM label_data")
 cursor.execute("DELETE FROM location_data")
 
 for _, row in location_data.iterrows():

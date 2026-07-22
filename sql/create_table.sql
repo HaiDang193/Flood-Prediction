@@ -28,7 +28,10 @@ CREATE TABLE river_data (
 );
 
 CREATE TABLE label_data(
+    flood_id INT PRIMARY KEY,
     location_id INT,
     date Date,
     flood INT
+    FOREIGN KEY(location_id) 
+    REFERENCES location_data(location_id)
 )
